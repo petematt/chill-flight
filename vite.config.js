@@ -2,6 +2,7 @@ import {defineConfig} from 'vite';
 import fs from 'fs';
 import process from 'node:process';
 import {execSync} from 'child_process';
+import {fileURLToPath} from 'url';
 
 function getGitInfo(isBuild = false, isPreview = false) {
   let commitHash = 'unknown';
@@ -80,10 +81,9 @@ export default defineConfig({
       // @capacitor-firebase/analytics lists firebase as an optional peer dep.
       // The web build uses Google Tag Manager directly, so we stub this out
       // to avoid requiring the full Firebase SDK as a web dependency.
-      'firebase/analytics': new URL(
-        './src/stubs/firebase-analytics.js',
-        import.meta.url
-      ).pathname,
+      'firebase/analytics': fileURLToPath(
+        new URL('./src/stubs/firebase-analytics.js', import.meta.url)
+      ),
     },
   },
   server: {

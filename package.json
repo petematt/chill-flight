@@ -20,7 +20,7 @@
     "ios:build": "node scripts/build-ios.js",
     "android": "npx cap sync android && npx cap open android",
     "android:build": "node scripts/build-android.js",
-    "test:syntax": "for f in *.js; do node --check \"$f\" || exit 1; done",
+    "test:syntax": "node scripts/check-syntax.js",
     "test:terrain": "node scripts/test-terrain.js",
     "test:scripts": "node scripts/test-html-scripts.js",
     "test:sim": "node scripts/test-sim.js",
