@@ -19,7 +19,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import {fileURLToPath} from 'url';
+import {fileURLToPath, pathToFileURL} from 'url';
 import * as espree from 'espree';
 
 const rootDir = path.resolve(
@@ -119,7 +119,9 @@ function htmlKeys(html) {
 for (const text of htmlKeys(read('index.html'))) add(text, 'index.html');
 
 // --- Data translated where it's shown ---
-const {PEOPLE} = await import(path.join(rootDir, 'people.js'));
+const {PEOPLE} = await import(
+  pathToFileURL(path.join(rootDir, 'people.js')).href
+);
 const lines = (field) => (field || []).flat(2);
 for (const p of PEOPLE) {
   add(p.name, 'people.js');
@@ -188,7 +190,9 @@ const placeholders = (s) =>
 let problems = hidden.length;
 const missingOut = [];
 for (const file of fs.readdirSync(path.join(rootDir, 'locales'))) {
-  const {default: table} = await import(path.join(rootDir, 'locales', file));
+  const {default: table} = await import(
+    pathToFileURL(path.join(rootDir, 'locales', file)).href
+  );
   const missing = [];
   for (const [text, from] of keys) {
     if (SAME.has(text)) continue;

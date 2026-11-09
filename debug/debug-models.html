@@ -5,7 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Debug | Models</title>
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <script>
+      // Early stubs so clicks or initial load before module evaluation never throw ReferenceError
+      window.currentColorSeed = 0;
+      window.gearUp = false;
+      window.__pendingViewModel = null;
+      window.viewModel = function (type, e, colorSeed) {
+        window.__pendingViewModel = {type, colorSeed: colorSeed || 0};
+        var btns = document.querySelectorAll('.model-btn');
+        for (var i = 0; i < btns.length; i++) {
+          btns[i].classList.remove('active');
+          var attr = btns[i].getAttribute('onclick') || '';
+          if (attr.indexOf("'" + type + "'") !== -1) {
+            btns[i].classList.add('active');
+            var nameEl = document.getElementById('model-name');
+            if (nameEl) nameEl.textContent = btns[i].textContent.trim();
+          }
+        }
+      };
+      window.cycleColors = function () {};
+      window.toggleGear = function () {};
+      window.toggleDestruction = function () {};
+    </script>
     <script type="module" src="/src/debug-models.js"></script>
     <style>
       :root {
@@ -153,6 +174,9 @@
       </button>
       <button class="model-btn" onclick="viewModel('buggy', event)">
         Buggy
+      </button>
+      <button class="model-btn" onclick="viewModel('balloon', event)">
+        Hot air balloon
       </button>
       <button class="model-btn" onclick="viewModel('road_vehicles', event)">
         Road vehicles

@@ -1063,9 +1063,44 @@ export function getSfxNodes() {
   };
 }
 
+export function playBurnerSound() {
+  if (!audioCtx || !masterGain) return;
+  try {
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(260, audioCtx.currentTime);
+    filter.Q.setValueAtTime(1.2, audioCtx.currentTime);
+
+    const gain = audioCtx.createGain();
+    const now = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.08, now + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    noise.start(now);
+    noise.stop(now + 1.9);
+  } catch {
+    /* ignore audio failures */
+  }
+}
+
 export {
   createNoiseBuffer,
   createCricketBuffer,
   createBreezeBuffer,
   createFrogBuffer,
 };
+

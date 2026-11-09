@@ -32,8 +32,9 @@ const ALLOWED_EXTS = new Set(['.js', '.html', '.css', '.md', '.json', '.glsl']);
 const problems = [];
 
 function checkFile(relPath) {
+  const normPath = relPath.replace(/\\/g, '/');
   // Ignore this check script itself
-  if (relPath === 'scripts/check-no-emdash.js') return;
+  if (normPath === 'scripts/check-no-emdash.js') return;
 
   const fullPath = path.join(rootDir, relPath);
   const content = fs.readFileSync(fullPath, 'utf8');
@@ -43,13 +44,13 @@ function checkFile(relPath) {
     const line = lines[i];
 
     // In AGENTS.md, allow the rule definition line itself
-    if (relPath === 'AGENTS.md' && line.includes('**No em dashes**:')) {
+    if (normPath === 'AGENTS.md' && line.includes('**No em dashes**:')) {
       continue;
     }
 
     if (line.includes('\u2014') || line.includes('&mdash;')) {
       problems.push({
-        file: relPath,
+        file: normPath,
         line: i + 1,
         text: line.trim(),
       });

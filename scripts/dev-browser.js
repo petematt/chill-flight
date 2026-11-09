@@ -13,6 +13,16 @@ import path from 'path';
 export const BASE = process.env.GAME_URL || 'http://localhost:5173/';
 const DEFAULT_CHROME_PATHS = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+  ...(process.env.LOCALAPPDATA
+    ? [
+        path.join(
+          process.env.LOCALAPPDATA,
+          'Google/Chrome/Application/chrome.exe'
+        ),
+      ]
+    : []),
   '/usr/lib/chromium/chromium',
   '/usr/bin/google-chrome',
   '/usr/bin/chromium',

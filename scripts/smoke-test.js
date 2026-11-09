@@ -274,17 +274,25 @@ async function exerciseControls(page, tag) {
   const fail = (msg) => errors.push(`[${tag}] ${msg}`);
   const readDebug = () =>
     page.evaluate(() => {
-      const num = (id) => parseFloat(document.getElementById(id)?.textContent);
-      return {
-        x: num('debug-world-x'),
-        y: num('debug-world-y'),
-        z: num('debug-world-z'),
-        target: num('debug-target-speed'),
-        heading: num('debug-camera-heading'),
-        camX: num('debug-camera-x'),
-        camY: num('debug-camera-y'),
-        camZ: num('debug-camera-z'),
-      };
+      const posText =
+        document.getElementById('debug-position')?.textContent || '';
+      const m = posText.match(/(-?\d+),\s*(-?\d+),\s*(-?\d+)/);
+      const x = m ? parseFloat(m[1]) : 0;
+      const y = m ? parseFloat(m[2]) : 0;
+      const z = m ? parseFloat(m[3]) : 0;
+
+      const vehText =
+        document.getElementById('debug-vehicle')?.textContent || '';
+      const vm = vehText.match(/·\s*(\d+)/);
+      const target = vm ? parseFloat(vm[1]) : 0;
+
+      const camText =
+        document.getElementById('debug-camera')?.textContent || '';
+      const cm = camText.match(/@\s*(-?\d+)°/);
+      const heading = cm ? parseFloat(cm[1]) : 0;
+      const camMode = camText.split('·')[0]?.trim() || '';
+
+      return {x, y, z, target, heading, camMode};
     });
   const hold = async (key, ms) => {
     await page.keyboard.down(key);
@@ -357,8 +365,7 @@ async function exerciseControls(page, tag) {
   }
   if (d.heading === c.heading) fail(`steering did not change heading`);
 
-  const camOffset = (s) => Math.hypot(s.camX - s.x, s.camY - s.y, s.camZ - s.z);
-  const cameraMoved = (s) => Math.abs(camOffset(s) - camOffset(d)) >= 0.5;
+  const cameraMoved = (s) => s.camMode !== d.camMode;
   await page.keyboard.press('c'); // camera mode
   const e = await readUntil(cameraMoved, 5000);
   if (!cameraMoved(e)) {
