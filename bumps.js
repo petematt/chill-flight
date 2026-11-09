@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import {state} from './state.js';
 import {camera} from './sky.js';
 import {activePlaneType, planeGroup} from './airplane.js';
+import {hooks} from './hooks.js';
 import {pushBuggy, slowBuggy} from './buggy.js';
 import {forEachTrafficPlane} from './traffic.js';
 import {forEachRoadCar} from './road-traffic.js';
@@ -98,6 +99,18 @@ function bodies() {
       bumpRadius('plane'),
       p.heading,
       (push, roll) => shove(p, push, roll, false)
+    );
+  });
+  hooks.forEachBalloon?.((b) => {
+    b.bumpKey ??= `balloon~${Math.random().toString(36).slice(2)}`;
+    add(
+      b.bumpKey,
+      b.x,
+      b.y + 6,
+      b.z,
+      8.0,
+      b.heading,
+      (push, roll) => shove(b, push, roll, false)
     );
   });
   // The cars on the roads: knocked sideways out of their lane, easing back

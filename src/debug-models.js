@@ -51,6 +51,7 @@ import {
 } from '../building-models.js';
 import {createTwinModel, setGearExtension} from '../twin.js';
 import {createBuggyModel, setBuggyHoverFold} from '../buggy-model.js';
+import {createBalloonModel} from '../balloon-model.js';
 import {
   createSeaplaneModel,
   planeMat,
@@ -251,6 +252,12 @@ function toggleDestruction() {
   }
 }
 
+// Expose globally early so HTML onclick attributes and buttons immediately work
+window.viewModel = viewModel;
+window.cycleColors = cycleColors;
+window.toggleGear = toggleGear;
+window.toggleDestruction = toggleDestruction;
+
 function viewModel(type, e, colorSeed = 0) {
   const keepCamera = !e && window.currentModelType === type;
   clearViewer();
@@ -274,6 +281,7 @@ function viewModel(type, e, colorSeed = 0) {
     'twin-engine',
     'jet',
     'buggy',
+    'balloon',
     'mushroom',
     'crystal',
     'road_vehicles',
@@ -295,12 +303,15 @@ function viewModel(type, e, colorSeed = 0) {
     'twin-engine',
     'twin_engine',
     'buggy',
+    'balloon',
   ].includes(type);
   gearToggle.style.display = supportsGear ? 'block' : 'none';
   if (type === 'airplane') {
     gearToggle.textContent = window.gearUp ? 'Floats down' : 'Floats up';
   } else if (type === 'buggy') {
     gearToggle.textContent = window.gearUp ? 'Wheels down' : 'Hover mode';
+  } else if (type === 'balloon') {
+    gearToggle.textContent = window.gearUp ? 'Burner off' : 'Burner glow';
   } else {
     gearToggle.textContent = window.gearUp ? 'Gear down' : 'Gear up';
   }
@@ -494,6 +505,20 @@ function viewModel(type, e, colorSeed = 0) {
         const buggy = createBuggyModel({planeColor: newColor});
         setBuggyHoverFold(buggy, window.gearUp ? 1 : 0);
         previewGroup.add(buggy);
+        break;
+      }
+
+      case 'balloon': {
+        const colors =
+          ChillFlightLogic && ChillFlightLogic.PLANE_COLORS
+            ? ChillFlightLogic.PLANE_COLORS
+            : [0xe0564c];
+        const newColor = colors[colorSeed % colors.length];
+        const balloon = createBalloonModel({
+          planeColor: newColor,
+          nightGlow: window.gearUp, // toggling gear in viewer triggers burner glow!
+        });
+        previewGroup.add(balloon);
         break;
       }
 
@@ -1217,9 +1242,13 @@ setTimeout(() => {
   const hash = window.location.hash.substring(1);
   if (hash) {
     viewModel(hash);
+  } else if (window.__pendingViewModel) {
+    const pending = window.__pendingViewModel;
+    window.__pendingViewModel = null;
+    viewModel(pending.type, null, pending.colorSeed || 0);
   } else {
     // Default to airplane
     const firstBtn = document.querySelector('.model-btn');
     if (firstBtn) firstBtn.click();
   }
-}, 100);
+}, 50);

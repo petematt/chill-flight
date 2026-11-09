@@ -88,6 +88,11 @@ export default defineConfig({
   },
   server: {
     host: true,
+    allowedHosts: true,
+    cors: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
   worker: {
     format: 'es',

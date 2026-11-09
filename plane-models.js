@@ -10,6 +10,7 @@ import {createTwinModel} from './twin.js';
 import {createJetModel} from './jet.js';
 import {createSeaplaneModel} from './airplane.js';
 import {createBuggyModel} from './buggy-model.js';
+import {createBalloonModel} from './balloon-model.js';
 import {softenAnimeLight} from './art-style.js';
 
 // The seaplane flies without the player's pontoons, so it has no landing
@@ -20,6 +21,7 @@ export const PLANE_BUILDERS = {
   twin: createTwinModel,
   jet: createJetModel,
   buggy: createBuggyModel,
+  balloon: createBalloonModel,
 };
 
 // One pair of materials per livery, shared by every plane wearing it (the
